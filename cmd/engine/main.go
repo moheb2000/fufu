@@ -17,6 +17,7 @@ type Application struct {
 	renderer   *sdl.Renderer
 	cfg        *config.Config
 	widgets    map[string]gui.Widget
+	dialogs    *gui.List
 	background *Background
 }
 
@@ -114,6 +115,58 @@ func (app *Application) initDraw() error {
 	}
 	app.background = bg
 
+	resolution, err := app.getResolution()
+	if err != nil {
+		return err
+	}
+
+	bgTextRect := sdl.Rect{X: 0, Y: 0, W: int32(float64(resolution.X) * 0.33), H: int32(resolution.Y)}
+	if app.cfg.DialogPanel.Direction == "right" {
+		bgTextRect.X = int32(resolution.X) - bgTextRect.W
+	}
+
+	wrapLength := int(app.convertLogicalToActualSizeX(int32(bgTextRect.W - bgTextRect.W/10)))
+
+	// Create a list for showing dialogs
+	list, err := gui.NewList(app.renderer, &gui.ListParams{
+		Spacing:  20,
+		Children: []gui.Widget{},
+	})
+	if err != nil {
+		return err
+	}
+	app.dialogs = list
+
+	// Limit the width of list
+	limit, err := gui.NewLimit(app.renderer, &gui.LimitParams{
+		Limit: wrapLength,
+		Child: list,
+	})
+	if err != nil {
+		return err
+	}
+
+	// Make list scrollable
+	scrollable, err := gui.NewScrollableArea(app.renderer, &gui.ScrollableAreaParams{
+		H:     app.convertLogicalToActualSizeY(int32(resolution.Y) * 5 / 8),
+		Child: limit,
+	})
+	if err != nil {
+		return err
+	}
+
+	// Change the position of the list
+	positioned, err := gui.NewPositioned(app.renderer, &gui.PositionedParams{
+		X:     app.convertLogicalToActualX(bgTextRect.X + bgTextRect.W/20),
+		Y:     app.convertLogicalToActualY(bgTextRect.W / 20),
+		Child: scrollable,
+	})
+	if err != nil {
+		return err
+	}
+
+	app.widgets["dialogPanel"] = positioned
+
 	return nil
 }
 
@@ -167,8 +220,11 @@ func (app *Application) mainLoop() error {
 						// TODO: Handle spaces to show the next dialog here
 					}
 				}
-			case *sdl.MouseWheelEvent:
-				// TODO: Handle mouse wheel event for scrolling in widgets. Perhaps using HandleEvent for each widget is better than handling scrolling here
+			}
+
+			// Run HandleEvent function of all widgets in event loop
+			for _, widget := range app.widgets {
+				widget.HandleEvent(event)
 			}
 		}
 
@@ -214,11 +270,11 @@ func (app *Application) cleanup() {
 }
 
 func (app *Application) say(L *lua.LState) int {
-	goodbye, _ := gui.NewText(app.renderer, &gui.TextParams{
+	text, _ := gui.NewText(app.renderer, &gui.TextParams{
 		Value: L.ToString(1),
 		Color: sdl.Color{R: 255, G: 255, B: 255, A: 255},
 	})
-	app.widgets["goodbye"] = goodbye
+	app.dialogs.AddWidget(text)
 
 	return 0
 }

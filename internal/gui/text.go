@@ -46,6 +46,8 @@ func (t *Text) Draw() (*DrawableObject, error) {
 	return t.drawableObject, nil
 }
 
+func (t *Text) HandleEvent(event sdl.Event) {}
+
 // updateTexture updates the texture of the widget in every frame if dirty is true
 func (t *Text) updateTexture() error {
 	// Check if texture needs to update
@@ -85,6 +87,10 @@ func (t *Text) makeParent(parent Widget) {
 	t.parent = parent
 }
 
+func (t *Text) getParent() Widget {
+	return t.parent
+}
+
 func (t *Text) setLimit(limit int) {
 	t.textParams.limit = limit
 	t.MarkDirty()
@@ -95,6 +101,7 @@ func (t *Text) MarkDirty() {
 	t.dirty = true
 
 	if t.parent != nil {
+		// fmt.Println(t.textParams.limit)
 		t.parent.MarkDirty()
 	}
 }

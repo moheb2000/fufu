@@ -42,6 +42,8 @@ func (l *Limit) updateTexture() error {
 		return nil
 	}
 
+	l.setLimit(l.limitParams.Limit)
+
 	do, err := l.limitParams.Child.Draw()
 	if err != nil {
 		return err
@@ -63,8 +65,16 @@ func (l *Limit) Draw() (*DrawableObject, error) {
 	return l.drawableObject, nil
 }
 
+func (l *Limit) HandleEvent(event sdl.Event) {
+	l.limitParams.Child.HandleEvent(event)
+}
+
 func (l *Limit) makeParent(parent Widget) {
 	l.parent = parent
+}
+
+func (l *Limit) getParent() Widget {
+	return l.parent
 }
 
 func (l *Limit) setLimit(limit int) {

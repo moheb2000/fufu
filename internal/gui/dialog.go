@@ -101,8 +101,17 @@ func (d *Dialog) Draw() (*DrawableObject, error) {
 	return d.drawableObject, nil
 }
 
+func (d *Dialog) HandleEvent(event sdl.Event) {
+	d.dialogParams.Character.HandleEvent(event)
+	d.dialogParams.Value.HandleEvent(event)
+}
+
 func (d *Dialog) makeParent(parent Widget) {
 	d.parent = parent
+}
+
+func (d *Dialog) getParent() Widget {
+	return d.parent
 }
 
 func (d *Dialog) setLimit(limit int) {

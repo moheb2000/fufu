@@ -64,8 +64,16 @@ func (p *Positioned) Draw() (*DrawableObject, error) {
 	return p.drawableObject, nil
 }
 
+func (p *Positioned) HandleEvent(event sdl.Event) {
+	p.positionedParams.Child.HandleEvent(event)
+}
+
 func (p *Positioned) makeParent(parent Widget) {
 	p.parent = parent
+}
+
+func (p *Positioned) getParent() Widget {
+	return p.parent
 }
 
 func (p *Positioned) setLimit(limit int) {

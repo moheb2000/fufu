@@ -58,6 +58,14 @@ func (l *List) updateTexture() error {
 	}
 	lh -= l.listParams.Spacing
 
+	// Fix error: Texture dimentions can't be zero
+	if lw <= 0 {
+		lw = 1
+	}
+	if lh <= 0 {
+		lh = 1
+	}
+
 	texture, err := l.renderer.CreateTexture(sdl.PIXELFORMAT_RGBA8888, sdl.TEXTUREACCESS_TARGET, lw, lh)
 	if err != nil {
 		return err
@@ -99,8 +107,18 @@ func (l *List) Draw() (*DrawableObject, error) {
 	return l.drawableObject, nil
 }
 
+func (l *List) HandleEvent(event sdl.Event) {
+	for _, widget := range l.listParams.Children {
+		widget.HandleEvent(event)
+	}
+}
+
 func (l *List) makeParent(parent Widget) {
 	l.parent = parent
+}
+
+func (l *List) getParent() Widget {
+	return l.parent
 }
 
 func (l *List) setLimit(limit int) {
@@ -115,6 +133,18 @@ func (l *List) MarkDirty() {
 	if l.parent != nil {
 		l.parent.MarkDirty()
 	}
+}
+
+func (l *List) AddWidget(w Widget) {
+	l.listParams.Children = append([]Widget{w}, l.listParams.Children...)
+
+	w.makeParent(l)
+	l.MarkDirty()
+}
+
+func (l *List) RemoveLastWidget() {
+	l.listParams.Children = l.listParams.Children[1:]
+	l.MarkDirty()
 }
 
 func (l *List) Destroy() {
