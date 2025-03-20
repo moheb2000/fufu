@@ -9,6 +9,7 @@ import (
 	"github.com/moheb2000/fufu/internal/gui"
 	"github.com/veandco/go-sdl2/img"
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -16,9 +17,17 @@ type Application struct {
 	window     *sdl.Window
 	renderer   *sdl.Renderer
 	cfg        *config.Config
+	fm         *gui.FontManager
+	lua        *Lua
 	widgets    map[string]gui.Widget
 	dialogs    *gui.List
 	background *Background
+}
+
+type Lua struct {
+	l  *lua.LState
+	co *lua.LState
+	fn *lua.LFunction
 }
 
 // RunApp is responsible for initialization of SDL, running the main loop and cleanup memory
@@ -32,6 +41,10 @@ func (app *Application) RunApp() error {
 	if err != nil {
 		return err
 	}
+
+	// Create a new font manager and add a default font
+	app.fm = gui.NewFontManager()
+	app.fm.LoadFont("default", app.cfg.DefaultFont, 16)
 
 	// Initialize the main renderer
 	err = app.initRenderer()
@@ -49,12 +62,16 @@ func (app *Application) RunApp() error {
 	defer app.cleanup()
 
 	// Start lua VM and compiler
-	L := lua.NewState()
-	defer L.Close()
-	L.SetGlobal("say", L.NewFunction(app.say))
-	if err := L.DoFile("main.lua"); err != nil {
-		log.Fatal(err)
+	app.lua.l = lua.NewState()
+	defer app.lua.l.Close()
+	app.lua.l.SetGlobal("say", app.lua.l.NewFunction(app.say))
+	fn, err := app.lua.l.LoadFile("main.lua")
+	if err != nil {
+		return err
 	}
+	app.lua.fn = fn
+	app.lua.co, _ = app.lua.l.NewThread()
+	// app.lua.l.Resume(app.lua.co, app.lua.fn)
 
 	// Run rhe main loop
 	return app.mainLoop()
@@ -69,6 +86,11 @@ func (app *Application) initWindow() error {
 
 	// Initialize SDL_img
 	if err := img.Init(img.INIT_PNG | img.INIT_JPG); err != nil {
+		return err
+	}
+
+	// Initialize SDL_ttf
+	if err := ttf.Init(); err != nil {
 		return err
 	}
 
@@ -218,6 +240,7 @@ func (app *Application) mainLoop() error {
 				if e.Type == sdl.KEYUP {
 					if e.Keysym.Sym == sdl.K_SPACE {
 						// TODO: Handle spaces to show the next dialog here
+						app.lua.l.Resume(app.lua.co, app.lua.fn)
 					}
 				}
 			}
@@ -266,6 +289,11 @@ func (app *Application) cleanup() {
 		app.window.Destroy()
 	}
 
+	app.fm.Close()
+	ttf.Quit()
+
+	img.Quit()
+
 	sdl.Quit()
 }
 
@@ -273,10 +301,11 @@ func (app *Application) say(L *lua.LState) int {
 	text, _ := gui.NewText(app.renderer, &gui.TextParams{
 		Value: L.ToString(1),
 		Color: sdl.Color{R: 255, G: 255, B: 255, A: 255},
+		Font:  app.fm.GetFont("default", 16),
 	})
 	app.dialogs.AddWidget(text)
 
-	return 0
+	return L.Yield(lua.LNumber(0))
 }
 
 // main is the starting point of engine.
@@ -289,6 +318,7 @@ func main() {
 
 	app := Application{
 		cfg: cfg,
+		lua: &Lua{},
 	}
 
 	err = app.RunApp()

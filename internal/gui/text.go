@@ -2,6 +2,7 @@ package gui
 
 import (
 	"github.com/veandco/go-sdl2/sdl"
+	"github.com/veandco/go-sdl2/ttf"
 )
 
 type Text struct {
@@ -15,6 +16,7 @@ type Text struct {
 type TextParams struct {
 	Value string
 	Color sdl.Color
+	Font  *ttf.Font
 	limit int
 }
 
@@ -61,7 +63,7 @@ func (t *Text) updateTexture() error {
 	}
 
 	// Make a text texture with font and specified color
-	surface, err := font.RenderUTF8BlendedWrapped(t.textParams.Value, t.textParams.Color, t.textParams.limit)
+	surface, err := t.textParams.Font.RenderUTF8BlendedWrapped(t.textParams.Value, t.textParams.Color, t.textParams.limit)
 	if err != nil {
 		return err
 	}
