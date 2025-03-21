@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"time"
+
 	"github.com/veandco/go-sdl2/sdl"
 	"github.com/veandco/go-sdl2/ttf"
 )
@@ -11,6 +13,7 @@ type Text struct {
 	renderer       *sdl.Renderer
 	textParams     *TextParams
 	drawableObject *DrawableObject
+	opacity        float64
 }
 
 type TextParams struct {
@@ -28,6 +31,7 @@ func NewText(renderer *sdl.Renderer, p *TextParams) (*Text, error) {
 		textParams:     p,
 		dirty:          true,
 		drawableObject: &DrawableObject{},
+		opacity:        1,
 	}
 
 	err := t.updateTexture()
@@ -50,6 +54,23 @@ func (t *Text) Draw() (*DrawableObject, error) {
 
 func (t *Text) HandleEvent(event sdl.Event) {}
 
+func (t *Text) FadeIn() func(time.Duration) bool {
+	t.opacity = 0
+
+	return func(dt time.Duration) bool {
+		if t.opacity < 1 {
+			t.opacity += dt.Seconds()
+			t.MarkDirty()
+		}
+
+		if t.opacity > 1 {
+			t.opacity = 1
+		}
+
+		return t.opacity == 1
+	}
+}
+
 // updateTexture updates the texture of the widget in every frame if dirty is true
 func (t *Text) updateTexture() error {
 	// Check if texture needs to update
@@ -61,6 +82,8 @@ func (t *Text) updateTexture() error {
 	if t.drawableObject.texture != nil {
 		t.drawableObject.texture.Destroy()
 	}
+
+	t.textParams.Color.A = uint8(t.opacity * 255)
 
 	// Make a text texture with font and specified color
 	surface, err := t.textParams.Font.RenderUTF8BlendedWrapped(t.textParams.Value, t.textParams.Color, t.textParams.limit)

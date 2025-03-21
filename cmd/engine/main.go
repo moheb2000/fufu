@@ -17,7 +17,9 @@ type Application struct {
 	window     *sdl.Window
 	renderer   *sdl.Renderer
 	cfg        *config.Config
+	dt         time.Duration
 	fm         *gui.FontManager
+	am         *gui.AnimationManager
 	lua        *Lua
 	widgets    map[string]gui.Widget
 	dialogs    *gui.List
@@ -45,6 +47,8 @@ func (app *Application) RunApp() error {
 	// Create a new font manager and add a default font
 	app.fm = gui.NewFontManager()
 	app.fm.LoadFont("default", app.cfg.DefaultFont, 16)
+
+	app.am = gui.NewAnimationManager()
 
 	// Initialize the main renderer
 	err = app.initRenderer()
@@ -218,6 +222,8 @@ func (app *Application) drawLoop() error {
 		gui.Render(app.renderer, w1)
 	}
 
+	app.am.Update(app.dt)
+
 	app.renderer.SetLogicalSize(int32(resolution.X), int32(resolution.Y))
 
 	return nil
@@ -265,6 +271,13 @@ func (app *Application) mainLoop() error {
 
 		// Set FPS
 		remaningTime := time.Second/time.Duration(app.cfg.FPS) - time.Since(startTime)
+
+		if remaningTime > 0 {
+			app.dt = time.Second / time.Duration(app.cfg.FPS)
+		} else {
+			app.dt = time.Since(startTime)
+		}
+
 		if remaningTime > 0 {
 			time.Sleep(remaningTime)
 		}
@@ -304,6 +317,7 @@ func (app *Application) say(L *lua.LState) int {
 		Font:  app.fm.GetFont("default", 16),
 	})
 	app.dialogs.AddWidget(text)
+	app.am.Add(text.FadeIn())
 
 	return L.Yield(lua.LNumber(0))
 }
@@ -318,6 +332,7 @@ func main() {
 
 	app := Application{
 		cfg: cfg,
+		dt:  time.Second / time.Duration(cfg.FPS),
 		lua: &Lua{},
 	}
 
