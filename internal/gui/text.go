@@ -83,8 +83,6 @@ func (t *Text) updateTexture() error {
 		t.drawableObject.texture.Destroy()
 	}
 
-	t.textParams.Color.A = uint8(t.opacity * 255)
-
 	// Make a text texture with font and specified color
 	surface, err := t.textParams.Font.RenderUTF8BlendedWrapped(t.textParams.Value, t.textParams.Color, t.textParams.limit)
 	if err != nil {
@@ -99,6 +97,8 @@ func (t *Text) updateTexture() error {
 	if err != nil {
 		return err
 	}
+
+	texture.SetAlphaMod(uint8(t.opacity * 255))
 
 	t.drawableObject.texture = texture
 

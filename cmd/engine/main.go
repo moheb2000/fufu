@@ -3,6 +3,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/moheb2000/fufu/internal/config"
@@ -21,6 +22,8 @@ type Application struct {
 	fm         *gui.FontManager
 	am         *gui.AnimationManager
 	lua        *Lua
+	state      string
+	result     *int
 	widgets    map[string]gui.Widget
 	dialogs    *gui.List
 	background *Background
@@ -50,6 +53,9 @@ func (app *Application) RunApp() error {
 
 	app.am = gui.NewAnimationManager()
 
+	result := 0
+	app.result = &result
+
 	// Initialize the main renderer
 	err = app.initRenderer()
 	if err != nil {
@@ -69,6 +75,7 @@ func (app *Application) RunApp() error {
 	app.lua.l = lua.NewState()
 	defer app.lua.l.Close()
 	app.lua.l.SetGlobal("say", app.lua.l.NewFunction(app.say))
+	app.lua.l.SetGlobal("options", app.lua.l.NewFunction(app.options))
 	fn, err := app.lua.l.LoadFile("main.lua")
 	if err != nil {
 		return err
@@ -244,7 +251,7 @@ func (app *Application) mainLoop() error {
 				running = false
 			case *sdl.KeyboardEvent:
 				if e.Type == sdl.KEYUP {
-					if e.Keysym.Sym == sdl.K_SPACE {
+					if app.state == "novel" && e.Keysym.Sym == sdl.K_SPACE {
 						// TODO: Handle spaces to show the next dialog here
 						app.lua.l.Resume(app.lua.co, app.lua.fn)
 					}
@@ -254,6 +261,13 @@ func (app *Application) mainLoop() error {
 			// Run HandleEvent function of all widgets in event loop
 			for _, widget := range app.widgets {
 				widget.HandleEvent(event)
+			}
+
+			if app.state == "options" && *app.result != 0 {
+				app.dialogs.RemoveLastWidget()
+				app.lua.l.Resume(app.lua.co, app.lua.fn, lua.LNumber(*app.result))
+				*app.result = 0
+				app.state = "novel"
 			}
 		}
 
@@ -319,7 +333,40 @@ func (app *Application) say(L *lua.LState) int {
 	app.dialogs.AddWidget(text)
 	app.am.Add(text.FadeIn())
 
-	return L.Yield(lua.LNumber(0))
+	return L.Yield(lua.LNil)
+}
+
+func (app *Application) options(L *lua.LState) int {
+	nArgs := L.GetTop()
+
+	list, _ := gui.NewList(app.renderer, &gui.ListParams{
+		// Children: []gui.Widget{},
+		Spacing: 5,
+	})
+
+	for i := 1; i <= nArgs; i++ {
+		text, _ := gui.NewText(app.renderer, &gui.TextParams{
+			Value: strconv.Itoa(i) + "- " + L.ToString(i),
+			Color: sdl.Color{R: 255, G: 255, B: 0, A: 255},
+			Font:  app.fm.GetFont("default", 16),
+		})
+
+		list.AddWidget(text)
+		app.am.Add(text.FadeIn())
+
+		app.state = "options"
+	}
+
+	ops, _ := gui.NewOptions(app.renderer, &gui.OptionsParams{
+		Options: list,
+		Result:  app.result,
+	})
+
+	app.dialogs.AddWidget(ops)
+
+	L.Push(lua.LNil)
+
+	return L.Yield(lua.LNumber(1))
 }
 
 // main is the starting point of engine.
@@ -331,9 +378,10 @@ func main() {
 	}
 
 	app := Application{
-		cfg: cfg,
-		dt:  time.Second / time.Duration(cfg.FPS),
-		lua: &Lua{},
+		cfg:   cfg,
+		dt:    time.Second / time.Duration(cfg.FPS),
+		lua:   &Lua{},
+		state: "novel",
 	}
 
 	err = app.RunApp()

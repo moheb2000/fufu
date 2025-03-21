@@ -143,6 +143,7 @@ func (l *List) AddWidget(w Widget) {
 }
 
 func (l *List) RemoveLastWidget() {
+	l.listParams.Children[0].Destroy()
 	l.listParams.Children = l.listParams.Children[1:]
 	l.MarkDirty()
 }

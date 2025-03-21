@@ -26,4 +26,6 @@ func (am *AnimationManager) Update(dt time.Duration) {
 	}
 
 	am.animations = newAnimation
+
+	// Maybe using clip slices here reduce memort usage
 }
