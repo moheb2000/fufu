@@ -3,6 +3,8 @@ package main
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
 
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -112,4 +114,19 @@ func (app *Application) convertLogicalToActualSizeY(ls int32) int32 {
 	_, actualY, _ := app.getActualLogicalSize()
 
 	return app.convertLogicalToActualY(ls) - (winY-actualY)/2
+}
+
+func hexToSDLColor(hex string) (sdl.Color, error) {
+	re := regexp.MustCompile(`^#?([0-9A-Fa-f]{6})$`)
+	matches := re.FindStringSubmatch(hex)
+
+	if matches == nil {
+		return sdl.Color{R: 255, G: 255, B: 255, A: 255}, fmt.Errorf("invalid hex color format: %s", hex)
+	}
+
+	r, _ := strconv.ParseUint(matches[1][0:2], 16, 8)
+	g, _ := strconv.ParseUint(matches[1][2:4], 16, 8)
+	b, _ := strconv.ParseUint(matches[1][4:6], 16, 8)
+
+	return sdl.Color{R: uint8(r), G: uint8(g), B: uint8(b), A: 255}, nil
 }
