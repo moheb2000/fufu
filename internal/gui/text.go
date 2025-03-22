@@ -54,6 +54,7 @@ func (t *Text) Draw() (*DrawableObject, error) {
 
 func (t *Text) HandleEvent(event sdl.Event) {}
 
+// FadeIn returns a func(time.Duration) bool that can be added to animation manager that will run independent from draw loop
 func (t *Text) FadeIn() func(time.Duration) bool {
 	t.opacity = 0
 
@@ -63,6 +64,7 @@ func (t *Text) FadeIn() func(time.Duration) bool {
 			t.MarkDirty()
 		}
 
+		// It will ensure opacity not exceed from 1
 		if t.opacity > 1 {
 			t.opacity = 1
 		}
@@ -98,6 +100,7 @@ func (t *Text) updateTexture() error {
 		return err
 	}
 
+	// Set alpha for texture for fade animation
 	texture.SetAlphaMod(uint8(t.opacity * 255))
 
 	t.drawableObject.texture = texture
@@ -108,14 +111,17 @@ func (t *Text) updateTexture() error {
 	return nil
 }
 
+// makeParent change the parent field to the provided argument
 func (t *Text) makeParent(parent Widget) {
 	t.parent = parent
 }
 
+// getParent returns the text widget parent
 func (t *Text) getParent() Widget {
 	return t.parent
 }
 
+// Set limit will change the width limit of Text and mark text widget dirty
 func (t *Text) setLimit(limit int) {
 	t.textParams.limit = limit
 	t.MarkDirty()
