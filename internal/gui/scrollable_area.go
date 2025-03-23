@@ -59,8 +59,8 @@ func (s *ScrollableArea) updateTexture() error {
 
 	s.renderer.SetRenderTarget(texture)
 
-	texture.SetBlendMode(sdl.BLENDMODE_BLEND)
-	s.renderer.SetDrawColor(255, 255, 255, 0)
+	texture.SetBlendMode(BLENDMOD_ONE)
+	s.renderer.SetDrawColor(0, 0, 0, 0)
 	s.renderer.Clear()
 
 	if s.scroll < 0 {

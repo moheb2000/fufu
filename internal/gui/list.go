@@ -74,8 +74,8 @@ func (l *List) updateTexture() error {
 	l.renderer.SetRenderTarget(texture)
 
 	// Making background transparent without reducing quality
-	texture.SetBlendMode(sdl.BLENDMODE_BLEND)
-	l.renderer.SetDrawColor(255, 255, 255, 0)
+	texture.SetBlendMode(BLENDMOD_ONE)
+	l.renderer.SetDrawColor(0, 0, 0, 0)
 	l.renderer.Clear()
 
 	var previousHeight int32

@@ -65,11 +65,9 @@ func (d *Dialog) updateTexture() error {
 	d.renderer.SetRenderTarget(texture)
 
 	// Making background transparent without lowering text quality
-	texture.SetBlendMode(sdl.BLENDMODE_BLEND)
-	d.renderer.SetDrawColor(d.dialogParams.Character.textParams.Color.R, d.dialogParams.Character.textParams.Color.G, d.dialogParams.Character.textParams.Color.B, 0)
-	d.renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: ctdo.w, H: ctdo.h})
-	d.renderer.SetDrawColor(d.dialogParams.Value.textParams.Color.R, d.dialogParams.Value.textParams.Color.G, d.dialogParams.Value.textParams.Color.B, 0)
-	d.renderer.FillRect(&sdl.Rect{X: ctdo.w, Y: 0, W: vtdo.w, H: vtdo.h})
+	texture.SetBlendMode(BLENDMOD_ONE)
+	d.renderer.SetDrawColor(0, 0, 0, 0)
+	d.renderer.Clear()
 
 	// Add character texture to the combined texture
 	d.renderer.Copy(ctdo.texture, nil, &sdl.Rect{X: 0, Y: 0, W: ctdo.w, H: ctdo.h})
