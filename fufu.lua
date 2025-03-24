@@ -34,3 +34,16 @@ function say(character, text, properties) end
 ---@param properties properties? A table containing properties of the text options
 ---@return result number The result of what user chose
 function choice(options, properties) end
+
+---@param path string The path to music for playing
+---@param loop boolean? whether the music should loop or not
+function play_music(path, loop) end
+
+function stop_music() end
+
+function pause_music() end
+
+function resume_music() end
+
+---@param path string the path to the sound for playing
+function play_sound(path) end

@@ -4,7 +4,10 @@
   "fullscreen": false,
   "resolution": 720,
   "defaultFont": "./assets/UbuntuSans-Regular.ttf",
+  "defaultTextColor": "#ffffff",
   "dialogPanel": {
-    "direction": "right"
+    "direction": "right",
+    "color": "#505050",
+    "width": 0.3
   }
 }

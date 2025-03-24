@@ -23,7 +23,6 @@ func (app *Application) mainLoop() error {
 			case *sdl.KeyboardEvent:
 				if e.Type == sdl.KEYUP {
 					if app.state == "novel" && e.Keysym.Sym == sdl.K_SPACE {
-						// TODO: Handle spaces to show the next dialog here
 						app.lua.l.Resume(app.lua.co, app.lua.fn)
 					}
 				}

@@ -9,13 +9,16 @@ import (
 
 // Config struct is a model for data in config.json
 type Config struct {
-	Title       string
-	FPS         int
-	FullScreen  bool
-	Resolution  int
-	DefaultFont string
-	DialogPanel struct {
+	Title            string
+	FPS              int
+	FullScreen       bool
+	Resolution       int
+	DefaultFont      string
+	DefaultTextColor string
+	DialogPanel      struct {
 		Direction string
+		Color     string
+		Width     float64
 	}
 }
 
@@ -32,19 +35,30 @@ func Get() (*Config, error) {
 
 	// Here is the default configs for engine
 	cfg := Config{
-		Title:       "Fufu Visual Novel Engine",
-		FPS:         30,
-		FullScreen:  false,
-		Resolution:  1080,
-		DefaultFont: "assets/UbuntuSans-Regular.ttf",
-		DialogPanel: struct{ Direction string }{
+		Title:            "Fufu Visual Novel Engine",
+		FPS:              30,
+		FullScreen:       false,
+		Resolution:       1080,
+		DefaultFont:      "assets/UbuntuSans-Regular.ttf",
+		DefaultTextColor: "#ffffff",
+		DialogPanel: struct {
+			Direction string
+			Color     string
+			Width     float64
+		}{
 			Direction: "left",
+			Color:     "#202020",
+			Width:     0.3,
 		},
 	}
 
 	err = decoder.Decode(&cfg)
 	if err != nil {
 		return nil, err
+	}
+
+	if cfg.DialogPanel.Width < 0.1 || cfg.DialogPanel.Width > 1 {
+		cfg.DialogPanel.Width = 0.3
 	}
 
 	if cfg.DialogPanel.Direction != "left" && cfg.DialogPanel.Direction != "right" {

@@ -17,7 +17,7 @@ func (app *Application) initDraw() error {
 		return err
 	}
 
-	bgTextRect := sdl.Rect{X: 0, Y: 0, W: int32(float64(resolution.X) * 0.33), H: int32(resolution.Y)}
+	bgTextRect := sdl.Rect{X: 0, Y: 0, W: int32(float64(resolution.X) * app.cfg.DialogPanel.Width), H: int32(resolution.Y)}
 	if app.cfg.DialogPanel.Direction == "right" {
 		bgTextRect.X = int32(resolution.X) - bgTextRect.W
 	}
@@ -77,13 +77,18 @@ func (app *Application) drawLoop() error {
 	app.background.draw(app.renderer)
 
 	// Define dialog panel rectangle
-	bgTextRect := sdl.Rect{X: 0, Y: 0, W: int32(float64(resolution.X) * 0.33), H: int32(resolution.Y)}
+	bgTextRect := sdl.Rect{X: 0, Y: 0, W: int32(float64(resolution.X) * app.cfg.DialogPanel.Width), H: int32(resolution.Y)}
 	if app.cfg.DialogPanel.Direction == "right" {
 		bgTextRect.X = int32(resolution.X) - bgTextRect.W
 	}
 
 	// Draw dialogs' background
-	app.renderer.SetDrawColor(20, 20, 20, 255)
+	dpc, err := hexToSDLColor(app.cfg.DialogPanel.Color)
+	if err != nil {
+		app.renderer.SetDrawColor(20, 20, 20, 255)
+	} else {
+		app.renderer.SetDrawColor(dpc.R, dpc.G, dpc.B, 255)
+	}
 	app.renderer.FillRect(&bgTextRect)
 
 	app.renderer.SetLogicalSize(0, 0)

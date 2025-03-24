@@ -16,6 +16,11 @@ func (app *Application) initScript() error {
 	app.lua.l.SetGlobal("narrate", app.lua.l.NewFunction(app.narrate))
 	app.lua.l.SetGlobal("say", app.lua.l.NewFunction(app.say))
 	app.lua.l.SetGlobal("choice", app.lua.l.NewFunction(app.choice))
+	app.lua.l.SetGlobal("play_music", app.lua.l.NewFunction(app.playMusic))
+	app.lua.l.SetGlobal("stop_music", app.lua.l.NewFunction(app.stopMusic))
+	app.lua.l.SetGlobal("pause_music", app.lua.l.NewFunction(app.pauseMusic))
+	app.lua.l.SetGlobal("resume_music", app.lua.l.NewFunction(app.resumeMusic))
+	app.lua.l.SetGlobal("play_sound", app.lua.l.NewFunction(app.playSound))
 	fn, err := app.lua.l.LoadFile("main.lua")
 	if err != nil {
 		return err
@@ -48,7 +53,7 @@ func (app *Application) narrate(L *lua.LState) int {
 	// Get function arguments
 	text := L.ToString(1)
 	properties := L.ToTable(2)
-	color := sdl.Color{R: 255, G: 255, B: 255, A: 255}
+	color, _ := hexToSDLColor(app.cfg.DefaultTextColor)
 	font := app.fm.GetFont("default", 16)
 	fontName := "default"
 	fontPath := ""
@@ -101,7 +106,7 @@ func (app *Application) say(L *lua.LState) int {
 	text := L.ToString(2)
 	properties := L.ToTable(3)
 	charColor := sdl.Color{R: 255, G: 0, B: 0, A: 255}
-	textColor := sdl.Color{R: 255, G: 255, B: 255, A: 255}
+	textColor, _ := hexToSDLColor(app.cfg.DefaultTextColor)
 	font := app.fm.GetFont("default", 16)
 	fontName := "default"
 	fontPath := ""
@@ -171,7 +176,7 @@ func (app *Application) choice(L *lua.LState) int {
 	// Get function arguments
 	options := L.ToTable(1)
 	properties := L.ToTable(2)
-	color := sdl.Color{R: 255, G: 255, B: 255, A: 255}
+	color, _ := hexToSDLColor(app.cfg.DefaultTextColor)
 	font := app.fm.GetFont("default", 16)
 	fontName := "default"
 	fontPath := ""
@@ -230,4 +235,39 @@ func (app *Application) choice(L *lua.LState) int {
 	L.Push(lua.LNil)
 
 	return L.Yield(lua.LNumber(1))
+}
+
+func (app *Application) playMusic(L *lua.LState) int {
+	path := L.ToString(1)
+	loop := L.ToBool(2)
+
+	app.aum.PlayMusic(path, loop)
+
+	return 0
+}
+
+func (app *Application) stopMusic(L *lua.LState) int {
+	app.aum.StopMusic()
+
+	return 0
+}
+
+func (app *Application) pauseMusic(L *lua.LState) int {
+	app.aum.PauseMusic()
+
+	return 0
+}
+
+func (app *Application) resumeMusic(L *lua.LState) int {
+	app.aum.ResumeMusic()
+
+	return 0
+}
+
+func (app *Application) playSound(L *lua.LState) int {
+	path := L.ToString(1)
+
+	app.aum.PlaySound(path)
+
+	return 0
 }

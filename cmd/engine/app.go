@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	"github.com/moheb2000/fufu/internal/audio"
 	"github.com/moheb2000/fufu/internal/config"
 	"github.com/moheb2000/fufu/internal/gui"
 	"github.com/veandco/go-sdl2/img"
@@ -18,6 +19,7 @@ type Application struct {
 	dt         time.Duration
 	fm         *gui.FontManager
 	am         *gui.AnimationManager
+	aum        *audio.AudioManager
 	lua        *Lua
 	state      string
 	result     *int
@@ -43,6 +45,7 @@ func (app *Application) RunApp() error {
 	result := 0
 	app.result = &result
 	app.am = gui.NewAnimationManager()
+	app.aum = audio.NewAudioManager(app.cfg.FPS)
 
 	// Initialize SDL and create the main window
 	err := app.initWindow()
