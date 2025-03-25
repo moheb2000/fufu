@@ -19,6 +19,9 @@ func printGreeting() {
 	// Engine name and repository address
 	fmt.Printf("Fufu Visual Novel Engine - https://github.com/moheb2000/fufu\n")
 
+	// Engine version
+	fmt.Printf("Engine Version: %s\n", engineVersion)
+
 	// SDL library version
 	sdlVersion := sdl.Version{}
 	sdl.GetVersion(&sdlVersion)

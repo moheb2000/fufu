@@ -11,6 +11,8 @@ import (
 func (app *Application) initScript() error {
 	// Start lua VM and compiler
 	app.lua.l = lua.NewState()
+	app.lua.l.SetGlobal("get_engine_version", app.lua.l.NewFunction(getEngineVersion))
+	app.lua.l.SetGlobal("get_game_version", app.lua.l.NewFunction(app.getGameVersion))
 	app.lua.l.SetGlobal("font", app.lua.l.NewFunction(font))
 	app.lua.l.SetGlobal("character", app.lua.l.NewFunction(character))
 	app.lua.l.SetGlobal("narrate", app.lua.l.NewFunction(app.narrate))
@@ -29,6 +31,18 @@ func (app *Application) initScript() error {
 	app.lua.co, _ = app.lua.l.NewThread()
 
 	return nil
+}
+
+func getEngineVersion(L *lua.LState) int {
+	L.Push(lua.LString(engineVersion))
+
+	return 1
+}
+
+func (app *Application) getGameVersion(L *lua.LState) int {
+	L.Push(lua.LString(app.cfg.GameVersion))
+
+	return 1
 }
 
 func character(L *lua.LState) int {

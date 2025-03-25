@@ -1,3 +1,6 @@
+print(get_engine_version())
+print(get_game_version())
+
 play_music("assets/music2.mp3", true)
 
 local main_font = font("main", "./assets/IMFellEnglish-Regular.ttf")

@@ -47,3 +47,9 @@ function resume_music() end
 
 ---@param path string the path to the sound for playing
 function play_sound(path) end
+
+---@return version string the engine version
+function get_engine_version() end
+
+---@return version string the game version
+function get_game_version() end

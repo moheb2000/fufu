@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Title            string
 	FPS              int
+	GameVersion      string
 	FullScreen       bool
 	Resolution       int
 	DefaultFont      string
@@ -37,6 +38,7 @@ func Get() (*Config, error) {
 	cfg := Config{
 		Title:            "Fufu Visual Novel Engine",
 		FPS:              30,
+		GameVersion:      "undefined",
 		FullScreen:       false,
 		Resolution:       1080,
 		DefaultFont:      "assets/UbuntuSans-Regular.ttf",

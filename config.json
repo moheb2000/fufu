@@ -1,6 +1,7 @@
 {
   "title": "My new game!",
   "fps": 60,
+  "gameVersion": "1.0.0",
   "fullscreen": false,
   "resolution": 720,
   "defaultFont": "./assets/UbuntuSans-Regular.ttf",

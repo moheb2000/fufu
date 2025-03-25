@@ -7,8 +7,14 @@ import (
 	"github.com/moheb2000/fufu/internal/config"
 )
 
+var engineVersion string
+
 // main is the starting point of engine.
 func main() {
+	if engineVersion == "" {
+		engineVersion = "undefined"
+	}
+
 	// Get engine configs from "config.json" file
 	cfg, err := config.Get()
 	if err != nil {
