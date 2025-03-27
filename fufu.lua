@@ -35,6 +35,15 @@ function say(character, text, properties) end
 ---@return result number The result of what user chose
 function choice(options, properties) end
 
+---@class bg_properties
+---@field originx string?
+---@field originy string?
+---@field fade boolean?
+
+---@param path string The path to the background image
+---@param bg_properties bg_properties? A table containing properties of the background
+function bg(path, bg_properties) end
+
 ---@param path string The path to music for playing
 ---@param loop boolean? whether the music should loop or not
 function play_music(path, loop) end

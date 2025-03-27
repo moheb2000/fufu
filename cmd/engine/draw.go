@@ -6,12 +6,6 @@ import (
 )
 
 func (app *Application) initDraw() error {
-	bg, err := newBackground(app.renderer, "assets/background.png")
-	if err != nil {
-		return err
-	}
-	app.background = bg
-
 	resolution, err := app.getResolution()
 	if err != nil {
 		return err
@@ -74,12 +68,14 @@ func (app *Application) drawLoop() error {
 		return err
 	}
 
-	app.background.draw(app.renderer)
-
 	// Define dialog panel rectangle
 	bgTextRect := sdl.Rect{X: 0, Y: 0, W: int32(float64(resolution.X) * app.cfg.DialogPanel.Width), H: int32(resolution.Y)}
 	if app.cfg.DialogPanel.Direction == "right" {
 		bgTextRect.X = int32(resolution.X) - bgTextRect.W
+	}
+
+	if app.background != nil {
+		app.background.draw()
 	}
 
 	// Draw dialogs' background

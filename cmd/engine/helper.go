@@ -133,3 +133,11 @@ func hexToSDLColor(hex string) (sdl.Color, error) {
 
 	return sdl.Color{R: uint8(r), G: uint8(g), B: uint8(b), A: 255}, nil
 }
+
+func int32Abs(x int32) int32 {
+	if x < 0 {
+		x = -x
+	}
+
+	return x
+}

@@ -18,6 +18,7 @@ func (app *Application) initScript() error {
 	app.lua.l.SetGlobal("narrate", app.lua.l.NewFunction(app.narrate))
 	app.lua.l.SetGlobal("say", app.lua.l.NewFunction(app.say))
 	app.lua.l.SetGlobal("choice", app.lua.l.NewFunction(app.choice))
+	app.lua.l.SetGlobal("bg", app.lua.l.NewFunction(app.bg))
 	app.lua.l.SetGlobal("play_music", app.lua.l.NewFunction(app.playMusic))
 	app.lua.l.SetGlobal("stop_music", app.lua.l.NewFunction(app.stopMusic))
 	app.lua.l.SetGlobal("pause_music", app.lua.l.NewFunction(app.pauseMusic))
@@ -249,6 +250,48 @@ func (app *Application) choice(L *lua.LState) int {
 	L.Push(lua.LNil)
 
 	return L.Yield(lua.LNumber(1))
+}
+
+func (app *Application) bg(L *lua.LState) int {
+	path := L.ToString(1)
+	properties := L.ToTable(2)
+	fade := false
+	originX := "left"
+	originY := "left"
+
+	if properties != nil {
+		if ox, ok := properties.RawGetString("originx").(lua.LString); ok {
+			originX = string(ox)
+		}
+
+		if oy, ok := properties.RawGetString("originy").(lua.LString); ok {
+			originX = string(oy)
+		}
+
+		if f, ok := properties.RawGetString("fade").(lua.LBool); ok {
+			fade = bool(f)
+		}
+	}
+
+	if app.background != nil {
+		app.background.Destroy()
+	}
+
+	background, _ := newBackground(app.renderer, &BackgroundParams{
+		Path: path,
+		Origin: &Origin{
+			X: originX,
+			Y: originY,
+		},
+		App: app,
+	})
+	app.background = background
+
+	if fade {
+		app.am.Add(app.background.FadeIn())
+	}
+
+	return L.Yield(lua.LNil)
 }
 
 func (app *Application) playMusic(L *lua.LState) int {

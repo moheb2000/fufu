@@ -83,7 +83,9 @@ func (app *Application) RunApp() error {
 
 // cleanup free the memory at the end of the engine
 func (app *Application) cleanup() {
-	app.background.Destroy()
+	if app.background != nil {
+		app.background.Destroy()
+	}
 
 	for _, widget := range app.widgets {
 		widget.Destroy()
