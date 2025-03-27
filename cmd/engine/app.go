@@ -26,6 +26,7 @@ type Application struct {
 	widgets    map[string]gui.Widget
 	dialogs    *gui.List
 	background *Background
+	splash     *Splash
 }
 
 type Lua struct {
@@ -85,6 +86,10 @@ func (app *Application) RunApp() error {
 func (app *Application) cleanup() {
 	if app.background != nil {
 		app.background.Destroy()
+	}
+
+	if app.splash != nil {
+		app.splash.Destroy()
 	}
 
 	for _, widget := range app.widgets {

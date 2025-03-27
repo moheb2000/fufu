@@ -5,6 +5,8 @@ play_music("assets/music2.mp3", true)
 
 local main_font = font("main", "./assets/IMFellEnglish-Regular.ttf")
 
+splash("assets/icon.png", "#222222", 2000)
+
 bg("assets/background.png", { fade = true, originx = "center", originy = "center" })
 
 narrate("What's your name? Can you tell me?", { text_color = "#2244ff", font = main_font, font_size = 22 })

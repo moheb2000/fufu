@@ -98,5 +98,19 @@ func (app *Application) drawLoop() error {
 
 	app.renderer.SetLogicalSize(int32(resolution.X), int32(resolution.Y))
 
+	// Draw splash
+	if app.splash != nil {
+		done, err := app.splash.draw()
+		if err != nil {
+			return err
+		}
+
+		if done {
+			app.splash.Destroy()
+			app.splash = nil
+			app.state = "novel"
+		}
+	}
+
 	return nil
 }

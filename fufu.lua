@@ -44,6 +44,11 @@ function choice(options, properties) end
 ---@param bg_properties bg_properties? A table containing properties of the background
 function bg(path, bg_properties) end
 
+---@param path string The path to the image of splash screen
+---@param color string The hex color of splash background
+---@param duration integer The duration in milliseconds that splash screen will last
+function splash(path, color, duration) end
+
 ---@param path string The path to music for playing
 ---@param loop boolean? whether the music should loop or not
 function play_music(path, loop) end

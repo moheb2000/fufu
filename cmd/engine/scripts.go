@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/moheb2000/fufu/internal/gui"
 	"github.com/veandco/go-sdl2/sdl"
@@ -19,6 +20,7 @@ func (app *Application) initScript() error {
 	app.lua.l.SetGlobal("say", app.lua.l.NewFunction(app.say))
 	app.lua.l.SetGlobal("choice", app.lua.l.NewFunction(app.choice))
 	app.lua.l.SetGlobal("bg", app.lua.l.NewFunction(app.bg))
+	app.lua.l.SetGlobal("splash", app.lua.l.NewFunction(app.sp))
 	app.lua.l.SetGlobal("play_music", app.lua.l.NewFunction(app.playMusic))
 	app.lua.l.SetGlobal("stop_music", app.lua.l.NewFunction(app.stopMusic))
 	app.lua.l.SetGlobal("pause_music", app.lua.l.NewFunction(app.pauseMusic))
@@ -290,6 +292,23 @@ func (app *Application) bg(L *lua.LState) int {
 	if fade {
 		app.am.Add(app.background.FadeIn())
 	}
+
+	return L.Yield(lua.LNil)
+}
+
+func (app *Application) sp(L *lua.LState) int {
+	path := L.ToString(1)
+	color, _ := hexToSDLColor(string(L.ToString(2)))
+	duration := L.ToInt(3)
+
+	splash, _ := newSplash(app.renderer, &SplashParams{
+		Path:     path,
+		Color:    color,
+		Duration: time.Millisecond * time.Duration(duration),
+		App:      app,
+	})
+	app.splash = splash
+	app.state = "splash"
 
 	return L.Yield(lua.LNil)
 }
