@@ -108,7 +108,7 @@ func (app *Application) drawLoop() error {
 		if done {
 			app.splash.Destroy()
 			app.splash = nil
-			app.state = "novel"
+			app.state = NOVEL_STATE
 		}
 	}
 

@@ -23,7 +23,7 @@ func main() {
 
 	app := Application{
 		cfg:   cfg,
-		state: "novel",
+		state: NOVEL_STATE,
 	}
 
 	err = app.RunApp()

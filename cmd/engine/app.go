@@ -21,7 +21,7 @@ type Application struct {
 	am         *gui.AnimationManager
 	aum        *audio.AudioManager
 	lua        *Lua
-	state      string
+	state      int
 	result     *int
 	widgets    map[string]gui.Widget
 	dialogs    *gui.List
@@ -34,6 +34,12 @@ type Lua struct {
 	co *lua.LState
 	fn *lua.LFunction
 }
+
+const (
+	NOVEL_STATE = iota
+	SPLASH_STATE
+	OPTIONS_STATE
+)
 
 // RunApp is responsible for initialization of SDL, running the main loop and cleanup memory
 func (app *Application) RunApp() error {

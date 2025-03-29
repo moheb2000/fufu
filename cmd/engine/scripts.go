@@ -239,7 +239,7 @@ func (app *Application) choice(L *lua.LState) int {
 		list.AddWidget(text)
 		app.am.Add(text.FadeIn())
 
-		app.state = "options"
+		app.state = OPTIONS_STATE
 	}
 
 	ops, _ := gui.NewOptions(app.renderer, &gui.OptionsParams{
@@ -308,7 +308,7 @@ func (app *Application) sp(L *lua.LState) int {
 		App:      app,
 	})
 	app.splash = splash
-	app.state = "splash"
+	app.state = SPLASH_STATE
 
 	return L.Yield(lua.LNil)
 }

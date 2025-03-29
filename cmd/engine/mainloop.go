@@ -22,7 +22,7 @@ func (app *Application) mainLoop() error {
 				running = false
 			case *sdl.KeyboardEvent:
 				if e.Type == sdl.KEYUP {
-					if app.state == "novel" && e.Keysym.Sym == sdl.K_SPACE {
+					if app.state == NOVEL_STATE && e.Keysym.Sym == sdl.K_SPACE {
 						app.lua.l.Resume(app.lua.co, app.lua.fn)
 					}
 				}
@@ -33,11 +33,11 @@ func (app *Application) mainLoop() error {
 				widget.HandleEvent(event)
 			}
 
-			if app.state == "options" && *app.result != 0 {
+			if app.state == OPTIONS_STATE && *app.result != 0 {
 				app.dialogs.RemoveLastWidget()
 				app.lua.l.Resume(app.lua.co, app.lua.fn, lua.LNumber(*app.result))
 				*app.result = 0
-				app.state = "novel"
+				app.state = NOVEL_STATE
 			}
 		}
 
