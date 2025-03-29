@@ -111,6 +111,11 @@ func (t *Text) updateTexture() error {
 	return nil
 }
 
+func (t *Text) setColor(color sdl.Color) {
+	t.textParams.Color = color
+	t.MarkDirty()
+}
+
 // makeParent change the parent field to the provided argument
 func (t *Text) makeParent(parent Widget) {
 	t.parent = parent
