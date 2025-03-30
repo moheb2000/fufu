@@ -58,6 +58,71 @@ func (app *Application) initDraw() error {
 
 	app.widgets["dialogPanel"] = positioned
 
+	// Create main menu
+	bc, _ := hexToSDLColor(app.cfg.MainMenu.Color)
+	bch, _ := hexToSDLColor(app.cfg.MainMenu.ColorHover)
+	bbc, _ := hexToSDLColor(app.cfg.MainMenu.BackgroundColor)
+	bbch, _ := hexToSDLColor(app.cfg.MainMenu.BackgroundColorHover)
+	startValue, _ := gui.NewText(app.renderer, &gui.TextParams{
+		Value: "Start",
+		Color: bc,
+		Font:  app.fm.GetFont("default", 16),
+	})
+
+	startButton, _ := gui.NewButton(app.renderer, &gui.ButtonParams{
+		Value:                startValue,
+		Color:                bc,
+		ColorHover:           bch,
+		BackgroundColor:      bbc,
+		BackgroundColorHover: bbch,
+		Width:                app.convertLogicalToActualSizeX(bgTextRect.W / 2),
+		Height:               50,
+	})
+
+	startButton.OnClick(func() {
+		app.state = NOVEL_STATE
+		app.lua.l.Resume(app.lua.co, app.lua.fn)
+		app.widgets["menu"].Destroy()
+		delete(app.widgets, "menu")
+	})
+
+	quitValue, _ := gui.NewText(app.renderer, &gui.TextParams{
+		Value: "Quit",
+		Color: bc,
+		Font:  app.fm.GetFont("default", 16),
+	})
+
+	quitButton, _ := gui.NewButton(app.renderer, &gui.ButtonParams{
+		Value:                quitValue,
+		Color:                bc,
+		ColorHover:           bch,
+		BackgroundColor:      bbc,
+		BackgroundColorHover: bbch,
+		Width:                app.convertLogicalToActualSizeX(bgTextRect.W / 2),
+		Height:               50,
+	})
+
+	// Add callback function to quit button that emit sdl.QUIT event
+	quitButton.OnClick(func() {
+		sdl.PushEvent(&sdl.QuitEvent{Type: sdl.QUIT, Timestamp: sdl.GetTicks()})
+	})
+
+	menuList, _ := gui.NewList(app.renderer, &gui.ListParams{
+		Spacing: 20,
+		Children: []gui.Widget{
+			startButton,
+			quitButton,
+		},
+	})
+
+	menu, _ := gui.NewPositioned(app.renderer, &gui.PositionedParams{
+		X:     app.convertLogicalToActualX(bgTextRect.X + bgTextRect.W/2 - bgTextRect.W/4),
+		Y:     app.convertLogicalToActualY(bgTextRect.Y),
+		Child: menuList,
+	})
+
+	app.widgets["menu"] = menu
+
 	return nil
 }
 
@@ -88,6 +153,12 @@ func (app *Application) drawLoop() error {
 	app.renderer.FillRect(&bgTextRect)
 
 	app.renderer.SetLogicalSize(0, 0)
+
+	// This is because the window size is changed after event handling in main loop
+	if pos, ok := app.widgets["menu"].(*gui.Positioned); ok {
+		pdo, _ := pos.Draw()
+		pos.SetPosition(app.convertLogicalToActualX(bgTextRect.X+bgTextRect.W/2-bgTextRect.W/4), app.convertLogicalToActualY(bgTextRect.Y+bgTextRect.H/2)-pdo.H/2)
+	}
 
 	for _, w := range app.widgets {
 		w1, _ := w.Draw()

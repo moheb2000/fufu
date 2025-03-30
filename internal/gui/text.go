@@ -92,8 +92,8 @@ func (t *Text) updateTexture() error {
 	}
 	defer surface.Free()
 
-	t.drawableObject.w = surface.W
-	t.drawableObject.h = surface.H
+	t.drawableObject.W = surface.W
+	t.drawableObject.H = surface.H
 
 	texture, err := t.renderer.CreateTextureFromSurface(surface)
 	if err != nil {

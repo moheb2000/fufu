@@ -50,11 +50,11 @@ func (l *List) updateTexture() error {
 	var lh int32
 	for _, widget := range l.listParams.Children {
 		do, _ := widget.Draw()
-		if lw < do.w {
-			lw = do.w + do.x
+		if lw < do.W {
+			lw = do.W + do.x
 		}
 
-		lh += do.h + do.y + l.listParams.Spacing
+		lh += do.H + do.y + l.listParams.Spacing
 	}
 	lh -= l.listParams.Spacing
 
@@ -82,14 +82,14 @@ func (l *List) updateTexture() error {
 	for _, widget := range l.listParams.Children {
 		do, _ := widget.Draw()
 
-		l.renderer.Copy(do.texture, nil, &sdl.Rect{X: do.x, Y: do.y + previousHeight, W: do.w, H: do.h})
-		previousHeight += do.h + do.y + l.listParams.Spacing
+		l.renderer.Copy(do.texture, nil, &sdl.Rect{X: do.x, Y: do.y + previousHeight, W: do.W, H: do.H})
+		previousHeight += do.H + do.y + l.listParams.Spacing
 	}
 
 	l.renderer.SetRenderTarget(nil)
 
-	l.drawableObject.w = lw
-	l.drawableObject.h = lh
+	l.drawableObject.W = lw
+	l.drawableObject.H = lh
 	l.drawableObject.texture = texture
 
 	// Reset dirty flag

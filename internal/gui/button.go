@@ -81,14 +81,14 @@ func (b *Button) updateTexture() error {
 	b.renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: b.buttonParams.Width, H: b.buttonParams.Height})
 
 	// Make text inside the button center
-	b.renderer.Copy(vdo.texture, nil, &sdl.Rect{X: b.buttonParams.Width/2 - vdo.w/2, Y: b.buttonParams.Height/2 - vdo.h/2, W: vdo.w, H: vdo.h})
+	b.renderer.Copy(vdo.texture, nil, &sdl.Rect{X: b.buttonParams.Width/2 - vdo.W/2, Y: b.buttonParams.Height/2 - vdo.H/2, W: vdo.W, H: vdo.H})
 
 	// Set render target back to nil
 	b.renderer.SetRenderTarget(nil)
 
 	b.drawableObject.texture = texture
-	b.drawableObject.w = b.buttonParams.Width
-	b.drawableObject.h = b.buttonParams.Height
+	b.drawableObject.W = b.buttonParams.Width
+	b.drawableObject.H = b.buttonParams.Height
 
 	b.dirty = false
 
@@ -179,12 +179,28 @@ func (b *Button) isMouseInside() bool {
 	// Get button position with adding all x and y params of drawable object for button parents
 	for parent := b.parent; parent != nil; parent = parent.getParent() {
 		do, _ := parent.Draw()
+
 		buttonX += do.x
 		buttonY += do.y
+
+		// TODO: change the inside map for scrollable area also
+		if l, ok := parent.(*List); ok {
+			var previousHeight int32
+			for _, widget := range l.listParams.Children {
+				do, _ := widget.Draw()
+
+				if b == widget {
+					buttonY += previousHeight
+					break
+				}
+
+				previousHeight += do.H + do.y + l.listParams.Spacing
+			}
+		}
 	}
 
 	// Check if the mouse position is inside the button
-	if mouseX >= buttonX && mouseX <= buttonX+b.drawableObject.w && mouseY >= buttonY && mouseY <= buttonY+b.drawableObject.h {
+	if mouseX >= buttonX && mouseX <= buttonX+b.drawableObject.W && mouseY >= buttonY && mouseY <= buttonY+b.drawableObject.H {
 		return true
 	}
 

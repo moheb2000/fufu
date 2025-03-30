@@ -15,7 +15,7 @@ type Widget interface {
 type DrawableObject struct {
 	x       int32
 	y       int32
-	w       int32
-	h       int32
+	W       int32
+	H       int32
 	texture *sdl.Texture
 }

@@ -10,5 +10,11 @@
     "direction": "right",
     "color": "#505050",
     "width": 0.3
+  },
+  "mainMenu": {
+    "color": "#ffffff",
+    "colorHover": "#000000",
+    "backgroundColor": "#045147",
+    "backgroundColorHover": "#ffffff"
   }
 }

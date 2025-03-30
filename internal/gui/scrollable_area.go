@@ -52,7 +52,7 @@ func (s *ScrollableArea) updateTexture() error {
 
 	do, _ := s.scrollableAreaParams.Child.Draw()
 
-	texture, err := s.renderer.CreateTexture(sdl.PIXELFORMAT_RGBA8888, sdl.TEXTUREACCESS_TARGET, do.w, s.scrollableAreaParams.H)
+	texture, err := s.renderer.CreateTexture(sdl.PIXELFORMAT_RGBA8888, sdl.TEXTUREACCESS_TARGET, do.W, s.scrollableAreaParams.H)
 	if err != nil {
 		return err
 	}
@@ -65,22 +65,22 @@ func (s *ScrollableArea) updateTexture() error {
 
 	if s.scroll < 0 {
 		s.scroll = 0
-	} else if s.scroll > do.h-s.scrollableAreaParams.H {
-		s.scroll = do.h - s.scrollableAreaParams.H
+	} else if s.scroll > do.H-s.scrollableAreaParams.H {
+		s.scroll = do.H - s.scrollableAreaParams.H
 	}
 
-	dst := sdl.Rect{X: do.x, Y: do.y, W: do.w, H: s.scrollableAreaParams.H}
-	if do.h < s.scrollableAreaParams.H {
-		dst.H = do.h
+	dst := sdl.Rect{X: do.x, Y: do.y, W: do.W, H: s.scrollableAreaParams.H}
+	if do.H < s.scrollableAreaParams.H {
+		dst.H = do.H
 	}
 
-	s.renderer.Copy(do.texture, &sdl.Rect{X: 0, Y: s.scroll, W: do.w, H: s.scrollableAreaParams.H}, &dst)
+	s.renderer.Copy(do.texture, &sdl.Rect{X: 0, Y: s.scroll, W: do.W, H: s.scrollableAreaParams.H}, &dst)
 
 	s.renderer.SetRenderTarget(nil)
 
 	s.drawableObject.texture = texture
-	s.drawableObject.w = do.w
-	s.drawableObject.h = s.scrollableAreaParams.H
+	s.drawableObject.W = do.W
+	s.drawableObject.H = s.scrollableAreaParams.H
 
 	s.dirty = false
 
@@ -138,7 +138,7 @@ func (s *ScrollableArea) isMouseInside() bool {
 		scrollableY += do.y
 	}
 
-	if mouseX >= scrollableX && mouseX <= scrollableX+s.drawableObject.w && mouseY >= scrollableY && mouseY <= scrollableY+s.drawableObject.h {
+	if mouseX >= scrollableX && mouseX <= scrollableX+s.drawableObject.W && mouseY >= scrollableY && mouseY <= scrollableY+s.drawableObject.H {
 		return true
 	}
 

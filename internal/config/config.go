@@ -21,6 +21,12 @@ type Config struct {
 		Color     string
 		Width     float64
 	}
+	MainMenu struct {
+		Color                string
+		ColorHover           string
+		BackgroundColor      string
+		BackgroundColorHover string
+	}
 }
 
 // Get returns a Config struct that has configs from user or the default one
@@ -51,6 +57,17 @@ func Get() (*Config, error) {
 			Direction: "left",
 			Color:     "#202020",
 			Width:     0.3,
+		},
+		MainMenu: struct {
+			Color                string
+			ColorHover           string
+			BackgroundColor      string
+			BackgroundColorHover string
+		}{
+			Color:                "#ffffff",
+			ColorHover:           "#000000",
+			BackgroundColor:      "#045147",
+			BackgroundColorHover: "#ffffff",
 		},
 	}
 

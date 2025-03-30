@@ -46,9 +46,12 @@ func (p *Positioned) updateTexture() error {
 		return err
 	}
 
-	p.drawableObject = do
-	p.drawableObject.x = p.positionedParams.X
-	p.drawableObject.y = p.positionedParams.Y
+	// Positioned must have a new drawable object and not using the child drawable object
+	p.drawableObject.x = do.x + p.positionedParams.X
+	p.drawableObject.y = do.y + p.positionedParams.Y
+	p.drawableObject.W = do.W
+	p.drawableObject.H = do.H
+	p.drawableObject.texture = do.texture
 
 	p.dirty = false
 
@@ -78,6 +81,18 @@ func (p *Positioned) getParent() Widget {
 
 func (p *Positioned) setLimit(limit int) {
 	p.positionedParams.Child.setLimit(limit)
+}
+
+func (p *Positioned) SetPosition(x, y int32) {
+	if p.positionedParams.X != x {
+		p.positionedParams.X = x
+		p.MarkDirty()
+	}
+
+	if p.positionedParams.Y != y {
+		p.positionedParams.Y = y
+		p.MarkDirty()
+	}
 }
 
 func (p *Positioned) MarkDirty() {

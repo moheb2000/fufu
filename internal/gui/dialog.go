@@ -57,7 +57,7 @@ func (d *Dialog) updateTexture() error {
 	vtdo, _ := d.dialogParams.Value.Draw()
 
 	// Create a texture two combine character texture and value texture in one.
-	texture, err := d.renderer.CreateTexture(sdl.PIXELFORMAT_RGBA8888, sdl.TEXTUREACCESS_TARGET, ctdo.w+vtdo.w, vtdo.h)
+	texture, err := d.renderer.CreateTexture(sdl.PIXELFORMAT_RGBA8888, sdl.TEXTUREACCESS_TARGET, ctdo.W+vtdo.W, vtdo.H)
 	if err != nil {
 		return err
 	}
@@ -70,17 +70,17 @@ func (d *Dialog) updateTexture() error {
 	d.renderer.Clear()
 
 	// Add character texture to the combined texture
-	d.renderer.Copy(ctdo.texture, nil, &sdl.Rect{X: 0, Y: 0, W: ctdo.w, H: ctdo.h})
+	d.renderer.Copy(ctdo.texture, nil, &sdl.Rect{X: 0, Y: 0, W: ctdo.W, H: ctdo.H})
 
 	// Add value texture to the combined texture
-	d.renderer.Copy(vtdo.texture, nil, &sdl.Rect{X: ctdo.w, Y: 0, W: vtdo.w, H: vtdo.h})
+	d.renderer.Copy(vtdo.texture, nil, &sdl.Rect{X: ctdo.W, Y: 0, W: vtdo.W, H: vtdo.H})
 
 	// Set render target back to nil
 	d.renderer.SetRenderTarget(nil)
 
 	// Update w, h and texture of drawable object
-	d.drawableObject.w = ctdo.w + vtdo.w
-	d.drawableObject.h = vtdo.h
+	d.drawableObject.W = ctdo.W + vtdo.W
+	d.drawableObject.H = vtdo.H
 	d.drawableObject.texture = texture
 
 	// Reset dirty flag
@@ -113,7 +113,7 @@ func (d *Dialog) getParent() Widget {
 }
 
 func (d *Dialog) setLimit(limit int) {
-	d.dialogParams.Value.setLimit(limit - int(d.dialogParams.Character.drawableObject.w))
+	d.dialogParams.Value.setLimit(limit - int(d.dialogParams.Character.drawableObject.W))
 }
 
 // MarkDirty changes the dirty parameter of widget to true. This function needs to be called if user wants to update the widget
