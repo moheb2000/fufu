@@ -80,6 +80,11 @@ func (app *Application) initDraw() error {
 	})
 
 	startButton.OnClick(func() {
+		if app.background != nil {
+			app.background.Destroy()
+			app.background = nil
+		}
+
 		app.state = NOVEL_STATE
 		app.lua.l.Resume(app.lua.co, app.lua.fn)
 		app.widgets["menu"].Destroy()
@@ -123,6 +128,22 @@ func (app *Application) initDraw() error {
 
 	app.widgets["menu"] = menu
 
+	// Create main menu background
+	if app.cfg.MainMenu.Background != "" {
+		mainMenuBackground, err := newBackground(app.renderer, &BackgroundParams{
+			Path: app.cfg.MainMenu.Background,
+			Origin: &Origin{
+				X: "left",
+				Y: "left",
+			},
+			App: app,
+		})
+		if err != nil {
+			return err
+		}
+
+		app.background = mainMenuBackground
+	}
 	return nil
 }
 
@@ -141,6 +162,12 @@ func (app *Application) drawLoop() error {
 
 	if app.background != nil {
 		app.background.draw()
+	}
+
+	if app.background == nil && app.state == MENU_STATE {
+		bgColor, _ := hexToSDLColor(app.cfg.MainMenu.BackgroundColor)
+		app.renderer.SetDrawColor(bgColor.R, bgColor.G, bgColor.B, 255)
+		app.renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: int32(resolution.X), H: int32(resolution.Y)})
 	}
 
 	// Draw dialogs' background

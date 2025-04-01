@@ -277,6 +277,7 @@ func (app *Application) bg(L *lua.LState) int {
 
 	if app.background != nil {
 		app.background.Destroy()
+		app.background = nil
 	}
 
 	background, _ := newBackground(app.renderer, &BackgroundParams{

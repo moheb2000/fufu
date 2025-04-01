@@ -15,6 +15,7 @@
     "color": "#ffffff",
     "colorHover": "#000000",
     "backgroundColor": "#045147",
-    "backgroundColorHover": "#ffffff"
+    "backgroundColorHover": "#ffffff",
+    "background": ""
   }
 }

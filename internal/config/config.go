@@ -26,6 +26,7 @@ type Config struct {
 		ColorHover           string
 		BackgroundColor      string
 		BackgroundColorHover string
+		Background           string
 	}
 }
 
@@ -63,11 +64,13 @@ func Get() (*Config, error) {
 			ColorHover           string
 			BackgroundColor      string
 			BackgroundColorHover string
+			Background           string
 		}{
 			Color:                "#ffffff",
 			ColorHover:           "#000000",
 			BackgroundColor:      "#045147",
 			BackgroundColorHover: "#ffffff",
+			Background:           "",
 		},
 	}
 
