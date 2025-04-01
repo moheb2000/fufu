@@ -23,7 +23,7 @@ func main() {
 
 	app := Application{
 		cfg:   cfg,
-		state: MENU_STATE,
+		state: BOOT_STATE,
 	}
 
 	err = app.RunApp()

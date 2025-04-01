@@ -37,6 +37,7 @@ type Lua struct {
 
 const (
 	NOVEL_STATE = iota
+	BOOT_STATE
 	SPLASH_STATE
 	MENU_STATE
 	OPTIONS_STATE

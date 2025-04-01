@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/moheb2000/fufu/internal/gui"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -144,6 +146,25 @@ func (app *Application) initDraw() error {
 
 		app.background = mainMenuBackground
 	}
+
+	// Create boot splash screen
+	if app.cfg.BootScreen {
+		splash, err := newSplash(app.renderer, &SplashParams{
+			Path:     "assets/logo.png",
+			Color:    sdl.Color{R: 0, G: 0, B: 0, A: 255},
+			Duration: time.Second * 3,
+			App:      app,
+		})
+		if err != nil {
+			return err
+		}
+
+		app.splash = splash
+		app.state = BOOT_STATE
+	} else {
+		app.state = MENU_STATE
+	}
+
 	return nil
 }
 
@@ -154,47 +175,50 @@ func (app *Application) drawLoop() error {
 		return err
 	}
 
-	// Define dialog panel rectangle
-	bgTextRect := sdl.Rect{X: 0, Y: 0, W: int32(float64(resolution.X) * app.cfg.DialogPanel.Width), H: int32(resolution.Y)}
-	if app.cfg.DialogPanel.Direction == "right" {
-		bgTextRect.X = int32(resolution.X) - bgTextRect.W
-	}
+	if app.state != BOOT_STATE {
 
-	if app.background != nil {
-		app.background.draw()
-	}
+		// Define dialog panel rectangle
+		bgTextRect := sdl.Rect{X: 0, Y: 0, W: int32(float64(resolution.X) * app.cfg.DialogPanel.Width), H: int32(resolution.Y)}
+		if app.cfg.DialogPanel.Direction == "right" {
+			bgTextRect.X = int32(resolution.X) - bgTextRect.W
+		}
 
-	if app.background == nil && app.state == MENU_STATE {
-		bgColor, _ := hexToSDLColor(app.cfg.MainMenu.BackgroundColor)
-		app.renderer.SetDrawColor(bgColor.R, bgColor.G, bgColor.B, 255)
-		app.renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: int32(resolution.X), H: int32(resolution.Y)})
-	}
+		if app.background != nil {
+			app.background.draw()
+		}
 
-	// Draw dialogs' background
-	dpc, err := hexToSDLColor(app.cfg.DialogPanel.Color)
-	if err != nil {
-		app.renderer.SetDrawColor(20, 20, 20, 255)
-	} else {
-		app.renderer.SetDrawColor(dpc.R, dpc.G, dpc.B, 255)
-	}
-	app.renderer.FillRect(&bgTextRect)
+		if app.background == nil && app.state == MENU_STATE {
+			bgColor, _ := hexToSDLColor(app.cfg.MainMenu.BackgroundColor)
+			app.renderer.SetDrawColor(bgColor.R, bgColor.G, bgColor.B, 255)
+			app.renderer.FillRect(&sdl.Rect{X: 0, Y: 0, W: int32(resolution.X), H: int32(resolution.Y)})
+		}
 
-	app.renderer.SetLogicalSize(0, 0)
+		// Draw dialogs' background
+		dpc, err := hexToSDLColor(app.cfg.DialogPanel.Color)
+		if err != nil {
+			app.renderer.SetDrawColor(20, 20, 20, 255)
+		} else {
+			app.renderer.SetDrawColor(dpc.R, dpc.G, dpc.B, 255)
+		}
+		app.renderer.FillRect(&bgTextRect)
 
-	// This is because the window size is changed after event handling in main loop
-	if pos, ok := app.widgets["menu"].(*gui.Positioned); ok {
-		pdo, _ := pos.Draw()
-		pos.SetPosition(app.convertLogicalToActualX(bgTextRect.X+bgTextRect.W/2-bgTextRect.W/4), app.convertLogicalToActualY(bgTextRect.Y+bgTextRect.H/2)-pdo.H/2)
-	}
+		app.renderer.SetLogicalSize(0, 0)
 
-	for _, w := range app.widgets {
-		w1, _ := w.Draw()
-		gui.Render(app.renderer, w1)
+		// This is because the window size is changed after event handling in main loop
+		if pos, ok := app.widgets["menu"].(*gui.Positioned); ok {
+			pdo, _ := pos.Draw()
+			pos.SetPosition(app.convertLogicalToActualX(bgTextRect.X+bgTextRect.W/2-bgTextRect.W/4), app.convertLogicalToActualY(bgTextRect.Y+bgTextRect.H/2)-pdo.H/2)
+		}
+
+		for _, w := range app.widgets {
+			w1, _ := w.Draw()
+			gui.Render(app.renderer, w1)
+		}
+
+		app.renderer.SetLogicalSize(int32(resolution.X), int32(resolution.Y))
 	}
 
 	app.am.Update(app.dt)
-
-	app.renderer.SetLogicalSize(int32(resolution.X), int32(resolution.Y))
 
 	// Draw splash
 	if app.splash != nil {
@@ -206,7 +230,11 @@ func (app *Application) drawLoop() error {
 		if done {
 			app.splash.Destroy()
 			app.splash = nil
-			app.state = NOVEL_STATE
+			if app.state == BOOT_STATE {
+				app.state = MENU_STATE
+			} else {
+				app.state = NOVEL_STATE
+			}
 		}
 	}
 

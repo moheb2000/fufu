@@ -2,8 +2,9 @@
   "title": "My new game!",
   "fps": 60,
   "gameVersion": "1.0.0",
-  "fullscreen": false,
+  "fullscreen": true,
   "resolution": 720,
+  "bootScreen": true,
   "defaultFont": "./assets/UbuntuSans-Regular.ttf",
   "defaultTextColor": "#ffffff",
   "dialogPanel": {

@@ -14,6 +14,7 @@ type Config struct {
 	GameVersion      string
 	FullScreen       bool
 	Resolution       int
+	BootScreen       bool
 	DefaultFont      string
 	DefaultTextColor string
 	DialogPanel      struct {
@@ -48,6 +49,7 @@ func Get() (*Config, error) {
 		GameVersion:      "undefined",
 		FullScreen:       false,
 		Resolution:       1080,
+		BootScreen:       true,
 		DefaultFont:      "assets/UbuntuSans-Regular.ttf",
 		DefaultTextColor: "#ffffff",
 		DialogPanel: struct {
